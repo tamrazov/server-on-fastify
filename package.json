@@ -1,0 +1,22 @@
+{
+  "name": "server-on-fastify",
+  "version": "1.0.0",
+  "description": "This is simple server for my app [task-tracker](https://github.com/aleksandrtamrazov/task-tracker)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aleksandrtamrazov/server-on-fastify.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aleksandrtamrazov/server-on-fastify/issues"
+  },
+  "homepage": "https://github.com/aleksandrtamrazov/server-on-fastify#readme",
+  "dependencies": {
+    "fastify": "3.21.0"
+  }
+}
