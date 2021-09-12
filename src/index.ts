@@ -1,4 +1,59 @@
 import Fastify, { FastifyInstance, RouteShorthandOptions } from 'fastify';
+import isEmpty from 'lodash.isempty';
+const tasks = [
+{
+  id: "1",
+  name: "ALEXANDR22",
+  priority: '1',
+  status: '1',
+  time_start: "2021-07-22T19:18:43.929Z",
+  time_end: "2021-07-22T22:39:43.929Z",
+  fact_time_start: "2021-07-22T19:18:43.929Z",
+  fact_time_end: "2021-07-22T22:39:43.929Z"
+},
+{
+  id: "2",
+  name: "f",
+  priority: '1',
+  status: '1',
+  time_start: "2021-07-22T19:18:43.929Z",
+  time_end: "2021-07-22T19:59:13.929Z",
+  fact_time_start: "2021-07-22T19:18:43.929Z",
+  fact_time_end: "2021-07-22T19:59:13.929Z"
+},
+{
+  id: "3",
+  name: "asd",
+  priority: '1',
+  status: '1',
+  time_start: "2021-07-22T19:18:43.929Z",
+  time_end: "2021-07-22T20:20:43.929Z",
+  fact_time_start: "2021-07-22T19:18:43.929Z",
+  fact_time_end: "2021-07-22T20:18:43.929Z"
+},
+{
+  id: "4",
+  name: "qwe",
+  priority: '1',
+  status: '1',
+  time_start: "2021-07-22T19:18:43.929Z",
+  time_end: "2021-07-22T23:20:13.929Z",
+  fact_time_start: "2021-07-22T19:18:43.929Z",
+  fact_time_end: "2021-07-22T23:20:13.929Z"
+},
+];
+const users = [
+  {
+    id: "1",
+    name: "Alex",
+    email: "box-1@gmail.com",
+    fullname: "Alex Aleksandrov_1",
+    password: '123456',
+    secretQuestion: "How old are you?",
+    secretAnswer: "1"
+  },
+];
+const TOKEN = 'asdpasdasmdqjdmcnjscklzcmzkdoasdal';
 
 const server: FastifyInstance = Fastify({})
 
@@ -18,7 +73,142 @@ const opts: RouteShorthandOptions = {
 }
 
 server.get('/ping', opts, async (request, reply) => {
-  return { pong: 'it worked!' }
+  return { pong: 'it worked!!!!!!!!!!!!!' }
+})
+
+server.get('/tasks', async (request, reply) => {
+  const {name}: any = request.query;
+  const newTasks = tasks.filter((task) => task.name.match(name));
+
+  return {tasks: newTasks}
+})
+
+server.post('/tasks', async (request, reply) => {
+  let attrs: any = request.body;
+  let errors: {[key: string]: string} = {};
+  for (let key of [
+    'name',
+    'status',
+    'priority',
+    'time_start',
+    'time_end',
+  ]) {
+    if(!attrs[key]) {
+      errors[key] = `${key} is required`
+    }
+  }
+  if (!isEmpty(errors)) return {errors};
+  const task = {id: tasks.length + 1, ...attrs}
+  const newTasks = tasks.push(task);
+
+  return {tasks: newTasks};
+})
+
+server.put('/tasks/:id', async (request, reply) => {
+  let {id}: any = request.params;
+  let attrs: any = request.body;
+  let errors: {[key: string]: string} = {};
+  for (let key of [
+    'name',
+    'status',
+    'priority',
+    'time_start',
+    'time_end',
+  ]) {
+    if(!attrs[key]) {
+      errors[key] = `${key} is required`
+    }
+  }
+  if (!isEmpty(errors)) return {errors};
+  let newTask = {...attrs};
+  tasks.splice(id - 1, 1, newTask)
+  return {tasks: tasks};
+})
+
+server.delete('/tasks/:id', async (request, reply) => {
+  let {id}: any = request.params;
+  const newTasks = tasks.filter((task) => task.id !== id);
+  return {list: newTasks};
+})
+
+server.get('/users', async (request, reply) => {
+  return users;
+})
+
+server.get('/profile/:id', async (request, reply) => {
+  let {id}: any = request.params;
+  let user = users.find(id);
+  return user;
+})
+
+server.put('/profile/:id', async (request, reply) => {
+  let {id}: any = request.params;
+  let attrs: any = request.body;
+  let errors: {[key: string]: string} = {};
+  for (let key of [
+    'name',
+    'email',
+    'fullname',
+    'password',
+    'secretQuestion',
+    'secretAnswer'
+  ]) {
+    if(!attrs[key]) {
+      errors[key] = `${key} is required`
+    }
+  }
+  if (!isEmpty(errors)) return {errors};
+  let newProfile = {...attrs};
+  users.splice(id - 1, 1, newProfile);
+  const currentUser = users.find((user) => user.id == id);
+  return {currentUser};
+})
+
+server.post('/login', async (request, reply) => {
+  let {email, password}: any = request.body
+  if (!email || !password) {
+    return {error: 'require email and password'};
+  }
+  const currentUser = users.find((item) => item.email === email);
+  if (currentUser === null) {
+    return {error: 'email not found'};
+  }
+
+  if (currentUser && currentUser.password !== password) {
+    return {error: 'password incorrect'};
+  }
+
+  return {id: currentUser?.id, token: TOKEN};
+})
+
+server.post('/register', async (request, reply) => {
+  let attrs: any = request.body;
+  let errors: {[key: string]: string} = {};
+  for (let key of ['name','email','password','secretQuestion','secretAnswer']) {
+    if(!attrs[key]) {
+      errors[key] = `${key} is required`
+    }
+  }
+  if (!isEmpty(errors)) return {errors};
+
+  if (!attrs['email']) {
+    return {errors: {email: 'incorrect email'}}
+  }
+
+  let id = (tasks.length + 1).toString();
+  let newProfile = {id, ...attrs};
+  users.push(newProfile);
+  return {id: newProfile.id, token: TOKEN};
+})
+
+server.post('/register', async (request, reply) => {
+  let email = request.body;
+  let user = users.find(item => item.email === email);
+  if (user === null) {
+    return {error: 'email not found'};
+  }
+
+  return {id: user?.id, secretQuestion: user?.secretQuestion, secretAnswer: user?.secretAnswer};
 })
 
 const start = async () => {
@@ -34,130 +224,3 @@ const start = async () => {
   }
 }
 start()
-
-// this.get("/tasks", (schema: any, request) => {
-//   const {name} = request.queryParams;
-//   let tasks = schema.tasks.all().models.filter((task: TaskType) => !!name ? task.name.match(name) : true);
-
-//   return {list: tasks}
-//   // return getRandomArg({list: tasks}, new Response(500, { some: 'header' }, { errors: {error: 'server '} }));
-// });
-
-// this.post("/tasks", (schema: any, request) => {
-//   let attrs = JSON.parse(request.requestBody);
-//   let errors: {[key: string]: string} = {};
-//   for (let key of [
-//     'name',
-//     'status',
-//     'priority',
-//     'time_start',
-//     'time_end',
-//   ]) {
-//     if(!attrs[key]) {
-//       errors[key] = `${key} is required`
-//     }
-//   }
-//   if (!isEmpty(errors)) return {errors};
-//   const task = schema.tasks.create(attrs);
-//   return schema.tasks.all();
-// })
-
-// this.put("/tasks/:id", (schema: any, request) => {
-//   let id = request.params.id;
-//   let attrs = JSON.parse(request.requestBody);
-//   let errors: {[key: string]: string} = {};
-//   for (let key of [
-//     'name',
-//     'status',
-//     'priority',
-//     'time_start',
-//     'time_end',
-//   ]) {
-//     if(!attrs[key]) {
-//       errors[key] = `${key} is required`
-//     }
-//   }
-//   if (!isEmpty(errors)) return {errors};
-//   schema.db.tasks.update(id, attrs);
-//   return schema.tasks.all();
-// });
-
-// this.delete("/tasks/:id", (schema: any, request) => {
-//   let id = request.params.id;
-//   schema.db.tasks.remove(id);
-//   return schema.tasks.all();
-// });
-
-// this.get("/users", (schema: any) => {
-//   return schema.users.all();
-// });
-
-// this.get("/profile/:id", (schema: any, request) => {
-//   let id = request.params.id;
-//   let user = schema.users.find(id);
-//   return user;
-// });
-
-// this.put("/profile/:id", (schema: any, request) => {
-//   let id = request.params.id;
-//   let attrs = JSON.parse(request.requestBody);
-//   let errors: {[key: string]: string} = {};
-//   for (let key of [
-//     'name',
-//     'email',
-//     'fullname',
-//     'password',
-//     'secretQuestion',
-//     'secretAnswer'
-//   ]) {
-//     if(!attrs[key]) {
-//       errors[key] = `${key} is required`
-//     }
-//   }
-//   if (!isEmpty(errors)) return {errors};
-//   schema.db.users.update(id, attrs);
-//   let user =  schema.users.find(id);
-//   return user;
-// });
-
-// this.post("/login", (schema, request) => {
-//   let {email, password} = JSON.parse(request.requestBody)
-//   if (!email || !password) {
-//     return {error: 'require email and password'};
-//   }
-//   const currentUser = schema.db.users.findBy({email});
-//   if (currentUser === null) {
-//     return {error: 'email not found'};
-//   }
-
-//   if (currentUser.password !== password) {
-//     return {error: 'password incorrect'};
-//   }
-//   return {id: currentUser.id, token: TOKEN};
-// })
-
-// this.post("/register", (schema: any, request) => {
-//   let attrs = JSON.parse(request.requestBody);
-//   let errors: {[key: string]: string} = {};
-//   for (let key of ['name','email','password','secretQuestion','secretAnswer']) {
-//     if(!attrs[key]) {
-//       errors[key] = `${key} is required`
-//     }
-//   }
-//   if (!isEmpty(errors)) return {errors};
-
-//   if (!validateEmail(attrs['email'])) {
-//     return {errors: {email: 'incorrect email'}}
-//   }
-//   const user = schema.users.create(attrs);
-//   return {id: user.id, token: TOKEN};
-// })
-
-// this.post("/forgot", (schema: any, request) => {
-//   let email = JSON.parse(request.requestBody);
-//   let user = schema.db.users.findBy({email});
-//   if (user === null) {
-//     return {error: 'email not found'};
-//   }
-//   return {id: user.id, secretQuestion: user.secretQuestion, secretAnswer: user.secretAnswer};
-// })

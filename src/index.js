@@ -40,6 +40,60 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var fastify_1 = __importDefault(require("fastify"));
+var tasks = [
+    {
+        id: "1",
+        name: "ALEXANDR22",
+        priority: '1',
+        status: '1',
+        time_start: "2021-07-22T19:18:43.929Z",
+        time_end: "2021-07-22T22:39:43.929Z",
+        fact_time_start: "2021-07-22T19:18:43.929Z",
+        fact_time_end: "2021-07-22T22:39:43.929Z"
+    },
+    {
+        id: "2",
+        name: "f",
+        priority: '1',
+        status: '1',
+        time_start: "2021-07-22T19:18:43.929Z",
+        time_end: "2021-07-22T19:59:13.929Z",
+        fact_time_start: "2021-07-22T19:18:43.929Z",
+        fact_time_end: "2021-07-22T19:59:13.929Z"
+    },
+    {
+        id: "3",
+        name: "asd",
+        priority: '1',
+        status: '1',
+        time_start: "2021-07-22T19:18:43.929Z",
+        time_end: "2021-07-22T20:20:43.929Z",
+        fact_time_start: "2021-07-22T19:18:43.929Z",
+        fact_time_end: "2021-07-22T20:18:43.929Z"
+    },
+    {
+        id: "4",
+        name: "qwe",
+        priority: '1',
+        status: '1',
+        time_start: "2021-07-22T19:18:43.929Z",
+        time_end: "2021-07-22T23:20:13.929Z",
+        fact_time_start: "2021-07-22T19:18:43.929Z",
+        fact_time_end: "2021-07-22T23:20:13.929Z"
+    },
+];
+var users = [
+    {
+        id: "1",
+        name: "Alex",
+        email: "box-1@gmail.com",
+        fullname: "Alex Aleksandrov_1",
+        password: '123456',
+        secretQuestion: "How old are you?",
+        secretAnswer: "1"
+    },
+];
+var TOKEN = 'asdpasdasmdqjdmcnjscklzcmzkdoasdal';
 var server = (0, fastify_1.default)({});
 var opts = {
     schema: {
@@ -57,7 +111,15 @@ var opts = {
 };
 server.get('/ping', opts, function (request, reply) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        return [2 /*return*/, { pong: 'it worked!' }];
+        return [2 /*return*/, { pong: 'it worked!!!!!!!!!!!!!' }];
+    });
+}); });
+server.get('/tasks', function (request, reply) { return __awaiter(void 0, void 0, void 0, function () {
+    var name, newTasks;
+    return __generator(this, function (_a) {
+        name = request.query.name;
+        newTasks = tasks.filter(function (task) { return task.name.match(name); });
+        return [2 /*return*/, { tasks: newTasks }];
     });
 }); });
 var start = function () { return __awaiter(void 0, void 0, void 0, function () {
