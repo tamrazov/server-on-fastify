@@ -4,7 +4,8 @@
   "description": "This is simple server for my app [task-tracker](https://github.com/aleksandrtamrazov/task-tracker)",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc -p tsconfig.json",
+    "start": "node src/index.js"
   },
   "repository": {
     "type": "git",
@@ -18,5 +19,9 @@
   "homepage": "https://github.com/aleksandrtamrazov/server-on-fastify#readme",
   "dependencies": {
     "fastify": "3.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "16.9.1",
+    "typescript": "4.4.3"
   }
 }
